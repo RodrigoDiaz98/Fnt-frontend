@@ -1,6 +1,7 @@
 import React,{useState} from "react";
 import Select from "react-select";
 import PropTypes from "prop-types";
+import {DatePicker} from "react-datepicker";
 import {Link} from "react-router-dom";
 import{
     Row,
@@ -25,6 +26,8 @@ const Solicitud=({
     const[sillon,setSillon]=useState('');
     const[salaRec,setSalaRec]=useState('');
     const[pabellon,setPabellon]=useState('');
+    const[date,setDate]=useState();
+    const[hora,setHora]=useState('');
     const[bloques,setBloques]=useState('');
     const[descripcion,setDescripcion]=useState('');
 
@@ -56,7 +59,7 @@ const Solicitud=({
                                         onChange={event => setPaciente(event.value)}
                                         options={
                                             lPacientes.slice().map((pac, index) => ({
-                                                value: pac,
+                                                value: pac.id,
                                                 label: pac.rut+" / "+pac.nombre
                                             }))
                                         }/>
@@ -69,7 +72,9 @@ const Solicitud=({
                                 onChange={(event) => setDescripcion(event.target.value)}
                                 />
                             </FormGroup>
-
+                            <FormGroup>
+                                <label>Fecha</label>
+                            </FormGroup>
                         </Form>
                         <Link to="/solicitudes">
                         <Button 
@@ -78,7 +83,7 @@ const Solicitud=({
                             onClick={(event)=>onSubmit(
                                 {
                                     "paciente": paciente,
-                                    "descipcion": descripcion
+                                    "descripcion": descripcion
                                 })}
                             >Agregar</Button>
                         </Link>
