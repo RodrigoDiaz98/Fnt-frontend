@@ -1,9 +1,15 @@
 import React from "react";
 import {Link} from "react-router-dom"
 import { Container, Row, Col, Card, Button, CardHeader, CardBody } from "shards-react";
-
+import {
+  PopupboxManager,
+  PopupboxContainer
+} from 'react-popupbox';
 import PageTitle from "../components/common/PageTitle";
 import PacienteService from '../services/paciente.service';
+import VerPaciente from './VerPaciente'
+
+
 
 
 class Pacientes extends React.Component {
@@ -13,6 +19,19 @@ class Pacientes extends React.Component {
         lPacientes : []
       };
     }
+    openPopupbox(pac) {
+      console.log('Aca LLegi');
+      const content = (
+        <div>
+          <VerPaciente paciente={pac}/>
+        </div>
+      )
+      PopupboxManager.open({content})
+    }
+    sortByID(x,y) {
+      return x.id - y.id;
+    }
+    
     handleGetPacientes() {
       PacienteService.getAll()
           .then(response => {
@@ -24,17 +43,27 @@ class Pacientes extends React.Component {
       PacienteService.remove(id)
         .catch((error) => console.log(error));
     }
+    handleGetPaciente(id) {
+      PacienteService.show(id)
+        .then(response => {
+          this.setState({Paciente : response.data});
+        })
+        .catch((error) => console.log(error));
+      
+    }
+   
 
     render() {
       this.handleGetPacientes();
       const p = this.state.lPacientes;
+      p.sort(this.sortByID);
       return(
     <Container fluid className="main-content-container px-4">
     {/* Page Header */}
     <Row noGutters className="page-header py-4">
       <PageTitle sm="4" title="Lista de pacientes" subtitle="Pacientes" className="text-sm-left" />
     </Row>
-
+    <PopupboxContainer/>
     {/* Default Light Table */}
     <Row>
     <Col>
@@ -53,6 +82,8 @@ class Pacientes extends React.Component {
             <h6 className="m-0">Pacientes</h6>
           </CardHeader>
           <CardBody className="p-0 pb-3">
+
+          <PopupboxContainer />
             <table className="table mb-0">
               <thead className="bg-light">
                 <tr>
@@ -79,9 +110,14 @@ class Pacientes extends React.Component {
                       <td>{pac.nombre}</td>
                       <td>{pac.rut}</td>
                       <td>
-                      <Button theme="primary" className="mb-2 mr-1" >
+                      
+                      <Button id={pac.id} onClick={() => this.openPopupbox(pac)} theme="primary" className="mb-2 mr-1" >
+                      
                       Ver
+                                           
                       </Button>
+                      
+                      
                       </td>
                       <td>
                       <Button theme="primary" className="mb-2 mr-1">
@@ -99,7 +135,9 @@ class Pacientes extends React.Component {
                 }
               </tbody>
             </table>
+            
           </CardBody>
+          
         </Card>
       </Col>
     </Row>
