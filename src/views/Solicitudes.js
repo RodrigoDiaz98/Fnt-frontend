@@ -35,6 +35,14 @@ class Solicitudes extends React.Component {
         .catch((error) => console.log(error));
       
     }
+    handleReservarSolicitudes(id){
+      SolicitudService.reservar(id)
+      .then(response => {
+        this.setState({Reserva : response.data});
+        
+      })
+      .catch((error) =>alert(error));
+    }
    
 
     render() {
@@ -91,10 +99,9 @@ class Solicitudes extends React.Component {
                       <td>{pac.descripcion}</td>
                       <td>{dateformat(pac.dtEmision, "dd/mm/yyyy, HH:MM")}</td>
                       <td>
-                      <Button theme="primary" className="mb-2 mr-1">
-                      Editar
-                      </Button>
+                        <Button id={pac.id}  onClick={()=>this.handleReservarSolicitudes(pac.id)}>Reservar</Button>
                       </td>
+                      
                       <td>
                       <Button id={pac.id + "delete"} onClick={() => this.handleDeleteSolicitudes(pac.id)} theme="primary" className="mb-2 mr-1">
                       Eliminar
