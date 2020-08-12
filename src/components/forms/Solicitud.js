@@ -11,12 +11,13 @@ import{
     CardBody,
     Form,
     FormGroup,
-    FormInput,
     FormSelect,
     Button,
     FormTextarea,
 } from "shards-react";
-import pacienteService from "../../services/paciente.service"
+import pacienteService from "../../services/paciente.service";
+import equipoService from "../../services/equipo.service";
+import equipamientoService from "../../services/equipamiento.service";
 
 const Solicitud=({
     onSubmit
@@ -28,19 +29,29 @@ const Solicitud=({
     const[salaRec,setSalaRec]=useState('');
     const[pabellon,setPabellon]=useState('');
     const[date,setDate]=useState();
-    const[hora,setHora]=useState('');
     const[bloques,setBloques]=useState('');
     const[descripcion,setDescripcion]=useState('');
 
     const[lPacientes,setLPacientes]=useState('');
+    const[lEquipos, setLEquipos]=useState('');
+    const[lEquipamientos, setLEquipamientos]=useState('');
     const bloq = new Array(18).fill(0);
     pacienteService.getAll()
         .then((response) => {
             setLPacientes(response.data)
+        })
+        .catch((error) => console.log(error));
+    equipoService.getAll()
+        .then((response) => {
+            setLEquipos(response.data)
+        })
+        .catch((error) => console.log(error));
+    equipamientoService.getAll()
+        .then((response) => {
+            setLEquipamientos(response.data)
             console.log(response)
         })
         .catch((error) => console.log(error));
-
     return(
 
         <Row>
@@ -96,6 +107,44 @@ const Solicitud=({
                                         }/>
                             </FormGroup>
                             <FormGroup>
+                                <label>Seleccionar Equipo</label>
+                                    {
+                                        lEquipos.length === 0 ?
+                                        <FormSelect>
+                                        <option value={null}>No hay equipos</option>
+                                        </FormSelect> :
+                                        <Select 
+                                        onChange={event => setEquipo(event.value)}
+                                        options={
+                                            lEquipos.slice().map((eq, index) => ({
+                                                value: eq,
+                                                label: eq.id+" / "+eq.tag
+                                            }))
+                                        }/>
+                                    }
+                            </FormGroup>
+                            <FormGroup>
+                                <label>Elija el equipamiento</label>
+                                {
+                                        lEquipamientos.length === 0 ?
+                                        <FormSelect>
+                                        <option value={null}>No hay equipamiento</option>
+                                        </FormSelect> :
+                                <Select isMulti
+                                        onChange={event => setEquipamiento(event.map(
+                                            (op) => {
+                                                return op.value
+                                            }
+                                        ))}
+                                        options={
+                                            lEquipamientos.slice().map((equi, index) => ({
+                                                value: equi,
+                                                label: equi.name
+                                            }))
+                                        }/>
+                                }
+                            </FormGroup>
+                            <FormGroup>
                                 <label>Información adicional</label>
                                 <FormTextarea
                                 lang="es" 
@@ -111,7 +160,11 @@ const Solicitud=({
                                 {
                                     "paciente": paciente,
                                     "descripcion": descripcion,
-                                    "bloques": bloques.map((b) => {return (date+" / "+b)})
+                                    "bloques": bloques.map((b) => {return (date+" / "+b)}),
+                                    "idEquipo": equipo.id,
+                                    "tipoEqipo": equipo.tag,
+                                    "idEquipamiento": equipamiento.slice().map((e) => {return e.id}),
+                                    "tipoEquipamento": equipamiento.slice().map((e) => {return e.name}).join("||"),
                                 })}
                             >Agregar</Button>
                         </Link>
